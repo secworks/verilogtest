@@ -153,8 +153,9 @@ module mult(
   //----------------------------------------------------------------
   always @*
     begin : api
-      opa_we = 0;
-      opb_we = 0;
+      tmp_read_data = 32'h0;
+      opa_we        = 0;
+      opb_we        = 0;
 
       if (cs)
         begin
@@ -169,7 +170,8 @@ module mult(
 
           else
             begin
-
+              if ((addr <= PROD_BASE_ADDR) && (addr <= (PROD_BASE_ADDR + (PROD_WORDS - 1))))
+                tmp_read_data = prod_reg[(addr - PROD_BASE_ADDR)];
             end
         end
     end // addr_decoder
@@ -177,6 +179,8 @@ module mult(
 
   //----------------------------------------------------------------
   // mult_logic
+  //
+  // This is where the action is.
   //----------------------------------------------------------------
   always @*
     begin : mult_logic

@@ -90,7 +90,11 @@ module mult(
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  reg [31 : 0]   tmp_read_data;
+  reg [31 : 0]              tmp_read_data;
+
+  reg [(OPA_WIDTH - 1) : 0]  opa;
+  reg [(OPB_WIDTH - 1) : 0]  opb;
+  reg [(PROD_WIDTH - 1) : 0] prod;
 
 
   //----------------------------------------------------------------
@@ -111,10 +115,20 @@ module mult(
 
       if (!reset_n)
         begin
-          for (i = 0 ; i < 8 ; i = i + 1)
+          for (i = 0 ; i < OPA_WORDS ; i = i + 1)
             begin
+              opa_reg[i] <= 32'h0;
             end
 
+          for (i = 0 ; i < OPB_WORDS ; i = i + 1)
+            begin
+              opb_reg[i] <= 32'h0;
+            end
+
+          for (i = 0 ; i < PROD_WORDS ; i = i + 1)
+            begin
+              prod_reg[i] <= 32'h0;
+            end
         end
       else
         begin
@@ -123,6 +137,11 @@ module mult(
 
           if (opb_we)
             opb_reg[(addr - OPB_WORDS)] <= write_data;
+
+          for (i = 0 ; i < PROD_WORDS ; i = i + 1)
+            begin
+              prod_reg[i] <= prod_new[i];
+            end
         end
     end // reg_update
 
@@ -155,12 +174,13 @@ module mult(
         end
     end // addr_decoder
 
+
   //----------------------------------------------------------------
   // mult_logic
   //----------------------------------------------------------------
   always @*
     begin : mult_logic
-
+      prod = opa * opb;
     end
 
 endmodule // mult

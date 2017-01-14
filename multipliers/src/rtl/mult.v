@@ -40,15 +40,15 @@
 //======================================================================
 
 module mult(
-           input wire           clk,
-           input wire           reset_n,
+            input wire           clk,
+            input wire           reset_n,
 
-           input wire           cs,
-           input wire           we,
-           input wire  [7 : 0]  addr,
-           input wire  [31 : 0] write_data,
-           output wire [31 : 0] read_data
-          );
+            input wire           cs,
+            input wire           we,
+            input wire  [7 : 0]  addr,
+            input wire  [31 : 0] write_data,
+            output wire [31 : 0] read_data
+           );
 
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
@@ -90,11 +90,7 @@ module mult(
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  reg [31 : 0]              tmp_read_data;
-
-  reg [(OPA_WIDTH - 1) : 0]  opa;
-  reg [(OPB_WIDTH - 1) : 0]  opb;
-  reg [(PROD_WIDTH - 1) : 0] prod;
+  reg [31 : 0] tmp_read_data;
 
 
   //----------------------------------------------------------------
@@ -184,7 +180,21 @@ module mult(
   //----------------------------------------------------------------
   always @*
     begin : mult_logic
+      integer i;
+      reg [(OPA_WIDTH - 1) : 0]  opa;
+      reg [(OPB_WIDTH - 1) : 0]  opb;
+      reg [(PROD_WIDTH - 1) : 0] prod;
+
+      for (i = 0 ; i < OPA_WORDS ; i = i + 1)
+        opa[(((i + 1) * 32) - 1) : (i * 32)] = opa_reg[i];
+
+      for (i = 0 ; i < OPB_WORDS ; i = i + 1)
+        opb[(((i + 1) * 32) - 1) : (i * 32)] = opb_reg[i];
+
       prod = opa * opb;
+
+      for (i = 0 ; i < PROD_WORDS ; i = i + 1)
+        prod_reg[i] = prod[(((i + 1) * 32) - 1) : (i * 32)];
     end
 
 endmodule // mult

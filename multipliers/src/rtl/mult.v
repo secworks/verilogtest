@@ -46,8 +46,8 @@ module mult(
             input wire           cs,
             input wire           we,
             input wire  [7 : 0]  addr,
-            input wire  [31 : 0] write_data,
-            output wire [31 : 0] read_data
+            input wire  [15 : 0] write_data,
+            output wire [15 : 0] read_data
            );
 
   //----------------------------------------------------------------
@@ -56,16 +56,16 @@ module mult(
   // Operand words must be > 32 and evenly divisable by 32.
   // Max size is 64 * 32 bits = 2048 bits.
   //----------------------------------------------------------------
-  localparam API_WORD_WIDTH  = 32;
+  localparam API_WIDTH       = 16;
 
   localparam OPA_WIDTH       = 64;
-  localparam OPA_WORDS       = OPA_WIDTH / API_WORD_WIDTH;
+  localparam OPA_WORDS       = OPA_WIDTH / API_WIDTH;
 
   localparam OPB_WIDTH       = 64;
-  localparam OPB_WORDS       = OPB_WIDTH / API_WORD_WIDTH;
+  localparam OPB_WORDS       = OPB_WIDTH / API_WIDTH;
 
   localparam PROD_WIDTH      = OPA_WIDTH + OPB_WIDTH;
-  localparam PROD_WORDS      = PROD_WIDTH / API_WORD_WIDTH;
+  localparam PROD_WORDS      = PROD_WIDTH / API_WIDTH;
 
   localparam OPA_BASE_ADDR   = 8'h00;
   localparam OPB_BASE_ADDR   = 8'h40;
@@ -75,22 +75,22 @@ module mult(
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
-  reg [31 : 0 ] opa_reg [0 : (OPA_WORDS -1)];
-  reg [31 : 0 ] opa_new [0 : (OPA_WORDS -1)];
-  reg           opa_we;
+  reg [(OPA_WIDTH - 1) : 0 ] opa_reg;
+  reg [(OPA_WIDTH - 1) : 0 ] opa_new;
+  reg                        opa_we;
 
-  reg [31 : 0 ] opb_reg [0 : (OPB_WORDS -1)];
-  reg [31 : 0 ] opb_new [0 : (OPB_WORDS -1)];
-  reg           opb_we;
+  reg [(OPA_WIDTH - 1) : 0 ] opb_reg;
+  reg [(OPA_WIDTH - 1) : 0 ] opb_new;
+  reg                        opb_we;
 
-  reg [31 : 0 ] prod_reg [0 : ((PROD_WIDTH / API_WORD_WIDTH) -1)];
-  reg [31 : 0 ] prod_new [0 : ((PROD_WIDTH / API_WORD_WIDTH) -1)];
+  reg [(PROD_WIDTH - 1) : 0 ] prod_reg;
+  reg [(PROD_WIDTH - 1) : 0 ] prod_new;
 
 
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  reg [31 : 0] tmp_read_data;
+  reg [(API_WIDTH -1) : 0] tmp_read_data;
 
 
   //----------------------------------------------------------------
@@ -107,70 +107,23 @@ module mult(
   //----------------------------------------------------------------
   always @ (posedge clk or negedge reset_n)
     begin : reg_update
-      integer i;
-
       if (!reset_n)
         begin
-          for (i = 0 ; i < OPA_WORDS ; i = i + 1)
-            begin
-              opa_reg[i] <= 32'h0;
-            end
-
-          for (i = 0 ; i < OPB_WORDS ; i = i + 1)
-            begin
-              opb_reg[i] <= 32'h0;
-            end
-
-          for (i = 0 ; i < PROD_WORDS ; i = i + 1)
-            begin
-              prod_reg[i] <= 32'h0;
-            end
+          opa_reg  <= {(OPA_WIDTH){1'h0}};
+          opb_reg  <= {(OPB_WIDTH){1'h0}};
+          prod_reg <= {(PROD_WIDTH){1'h0}};
         end
       else
         begin
+          prod_reg <= prod_new;
+
           if (opa_we)
-            opa_reg[(addr - OPA_WORDS)] <= write_data;
+            opa_reg <= opa_new;
 
           if (opb_we)
-            opb_reg[(addr - OPB_WORDS)] <= write_data;
-
-          for (i = 0 ; i < PROD_WORDS ; i = i + 1)
-            begin
-              prod_reg[i] <= prod_new[i];
-            end
+            opb_reg <= opb_new;
         end
     end // reg_update
-
-
-  //----------------------------------------------------------------
-  // api
-  //
-  // The interface command decoding logic.
-  //----------------------------------------------------------------
-  always @*
-    begin : api
-      tmp_read_data = 32'h0;
-      opa_we        = 0;
-      opb_we        = 0;
-
-      if (cs)
-        begin
-          if (we)
-            begin
-              if ((addr <= OPA_BASE_ADDR) && (addr <= (OPA_BASE_ADDR + (OPA_WORDS - 1))))
-                opa_we = 1;
-
-              if ((addr <= OPB_BASE_ADDR) && (addr <= (OPB_BASE_ADDR + (OPB_WORDS - 1))))
-                opb_we = 1;
-            end
-
-          else
-            begin
-              if ((addr <= PROD_BASE_ADDR) && (addr <= (PROD_BASE_ADDR + (PROD_WORDS - 1))))
-                tmp_read_data = prod_reg[(addr - PROD_BASE_ADDR)];
-            end
-        end
-    end // addr_decoder
 
 
   //----------------------------------------------------------------
@@ -180,22 +133,34 @@ module mult(
   //----------------------------------------------------------------
   always @*
     begin : mult_logic
-      integer i;
-      reg [(OPA_WIDTH - 1) : 0]  opa;
-      reg [(OPB_WIDTH - 1) : 0]  opb;
-      reg [(PROD_WIDTH - 1) : 0] prod;
-
-      for (i = 0 ; i < OPA_WORDS ; i = i + 1)
-        opa[(((i + 1) * 32) - 1) : (i * 32)] = opa_reg[i];
-
-      for (i = 0 ; i < OPB_WORDS ; i = i + 1)
-        opb[(((i + 1) * 32) - 1) : (i * 32)] = opb_reg[i];
-
-      prod = opa * opb;
-
-      for (i = 0 ; i < PROD_WORDS ; i = i + 1)
-        prod_reg[i] = prod[(((i + 1) * 32) - 1) : (i * 32)];
+      prod_new = opa_reg * opb_reg;
     end
+
+
+  //----------------------------------------------------------------
+  // api
+  //
+  // The interface command decoding logic.
+  //----------------------------------------------------------------
+  always @*
+    begin : api
+      tmp_read_data = {(API_WIDTH){1'h0}};
+      opa_new       = {(OPA_WIDTH){1'h0}};
+      opa_we        = 0;
+      opb_new       = {(OPB_WIDTH){1'h0}};
+      opb_we        = 0;
+
+      if (cs)
+        begin
+          if (we)
+            begin
+            end
+
+          else
+            begin
+            end
+        end
+    end // addr_decoder
 
 endmodule // mult
 

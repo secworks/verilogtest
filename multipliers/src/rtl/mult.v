@@ -40,20 +40,19 @@
 //======================================================================
 
 module mult(
-            input wire           clk,
-            input wire           reset_n,
-
-            input wire           cs,
-            input wire           we,
-            input wire  [7 : 0]  addr,
-            input wire  [15 : 0] write_data,
-            output wire [15 : 0] read_data
+            input wire                        clk,
+            input wire                        reset_n,
+            input wire                        cs,
+            input wire                        we,
+            input wire  [7 : 0]               addr,
+            input wire  [(API_WIDTH - 1) : 0] write_data,
+            output wire [(API_WIDTH - 1) : 0] read_data
            );
 
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  localparam API_WIDTH       = 16;
+  parameter API_WIDTH        = 16;
 
   localparam OPA_WIDTH       = 64;
   localparam OPA_WORDS       = OPA_WIDTH / API_WIDTH;

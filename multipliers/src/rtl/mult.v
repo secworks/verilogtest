@@ -52,24 +52,23 @@ module mult(
 
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
-  //
-  // Operand words must be > 32 and evenly divisable by 32.
-  // Max size is 64 * 32 bits = 2048 bits.
   //----------------------------------------------------------------
   localparam API_WIDTH       = 16;
 
   localparam OPA_WIDTH       = 64;
   localparam OPA_WORDS       = OPA_WIDTH / API_WIDTH;
+  localparam OPA_BASE_ADDR   = 8'h00;
+  localparam OPA_TOP_ADDR    = (OPA_BASE_ADDR + OPA_WORDS - 1);
 
   localparam OPB_WIDTH       = 64;
   localparam OPB_WORDS       = OPB_WIDTH / API_WIDTH;
+  localparam OPB_BASE_ADDR   = 8'h40;
+  localparam OPB_TOP_ADDR    = (OPB_BASE_ADDR + OPB_WORDS - 1);
 
   localparam PROD_WIDTH      = OPA_WIDTH + OPB_WIDTH;
   localparam PROD_WORDS      = PROD_WIDTH / API_WIDTH;
-
-  localparam OPA_BASE_ADDR   = 8'h00;
-  localparam OPB_BASE_ADDR   = 8'h40;
   localparam PROD_BASE_ADDR  = 8'h80;
+  localparam PROD_TOP_ADDR   = (PROD_BASE_ADDR + PROD_WORDS - 1);
 
 
   //----------------------------------------------------------------
@@ -154,6 +153,15 @@ module mult(
         begin
           if (we)
             begin
+              if ((addr <= OPA_BASE_ADDR) && (addr <= OPA_TOP_ADDR))
+                begin
+                  opa_we = 1;
+                end
+
+              if ((addr <= OPB_BASE_ADDR) && (addr <= OPB_TOP_ADDR))
+                begin
+                  opa_we = 1;
+                end
             end
 
           else

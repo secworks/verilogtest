@@ -49,40 +49,41 @@ module mult(
             output wire [(API_WIDTH - 1) : 0] read_data
            );
 
+
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter API_WIDTH        = 16;
+  parameter API_WIDTH       = 16;
 
-  localparam OPA_WIDTH       = 64;
-  localparam OPA_WORDS       = OPA_WIDTH / API_WIDTH;
-  localparam OPA_BASE_ADDR   = 8'h00;
-  localparam OPA_TOP_ADDR    = (OPA_BASE_ADDR + OPA_WORDS - 1);
+  localparam OPA_WIDTH      = 64;
+  localparam OPA_WORDS      = OPA_WIDTH / API_WIDTH;
+  localparam OPA_BASE_ADDR  = 8'h00;
+  localparam OPA_TOP_ADDR   = (OPA_BASE_ADDR + OPA_WORDS - 1);
 
-  localparam OPB_WIDTH       = 64;
-  localparam OPB_WORDS       = OPB_WIDTH / API_WIDTH;
-  localparam OPB_BASE_ADDR   = 8'h40;
-  localparam OPB_TOP_ADDR    = (OPB_BASE_ADDR + OPB_WORDS - 1);
+  localparam OPB_WIDTH      = 64;
+  localparam OPB_WORDS      = OPB_WIDTH / API_WIDTH;
+  localparam OPB_BASE_ADDR  = 8'h40;
+  localparam OPB_TOP_ADDR   = (OPB_BASE_ADDR + OPB_WORDS - 1);
 
-  localparam PROD_WIDTH      = OPA_WIDTH + OPB_WIDTH;
-  localparam PROD_WORDS      = PROD_WIDTH / API_WIDTH;
-  localparam PROD_BASE_ADDR  = 8'h80;
-  localparam PROD_TOP_ADDR   = (PROD_BASE_ADDR + PROD_WORDS - 1);
+  localparam PROD_WIDTH     = OPA_WIDTH + OPB_WIDTH;
+  localparam PROD_WORDS     = PROD_WIDTH / API_WIDTH;
+  localparam PROD_BASE_ADDR = 8'h80;
+  localparam PROD_TOP_ADDR  = (PROD_BASE_ADDR + PROD_WORDS - 1);
 
 
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
-  reg [(OPA_WIDTH - 1) : 0 ] opa_reg;
-  reg [(OPA_WIDTH - 1) : 0 ] opa_new;
-  reg                        opa_we;
+  reg [(OPA_WIDTH - 1) : 0] opa_reg;
+  reg [(OPA_WIDTH - 1) : 0] opa_new;
+  reg                       opa_we;
 
-  reg [(OPA_WIDTH - 1) : 0 ] opb_reg;
-  reg [(OPA_WIDTH - 1) : 0 ] opb_new;
-  reg                        opb_we;
+  reg [(OPA_WIDTH - 1) : 0] opb_reg;
+  reg [(OPA_WIDTH - 1) : 0] opb_new;
+  reg                       opb_we;
 
-  reg [(PROD_WIDTH - 1) : 0 ] prod_reg;
-  reg [(PROD_WIDTH - 1) : 0 ] prod_new;
+  reg [(PROD_WIDTH - 1) : 0] prod_reg;
+  reg [(PROD_WIDTH - 1) : 0] prod_new;
 
 
   //----------------------------------------------------------------
@@ -154,21 +155,24 @@ module mult(
             begin
               if ((addr <= OPA_BASE_ADDR) && (addr <= OPA_TOP_ADDR))
                 begin
+                  opa_new[API_WIDTH * (addr - OPA_BASE_ADDR) +: API_WIDTH] = write_data;
                   opa_we = 1;
                 end
 
               if ((addr <= OPB_BASE_ADDR) && (addr <= OPB_TOP_ADDR))
                 begin
-                  opa_we = 1;
+                  opb_new[API_WIDTH * (addr - OPB_BASE_ADDR) +: API_WIDTH] = write_data;
+                  opb_we = 1;
                 end
             end
 
           else
             begin
+              if ((addr <= PROD_BASE_ADDR) && (addr <= PROD_TOP_ADDR))
+                tmp_read_data = prod_reg[API_WIDTH * (addr - PROD_BASE_ADDR) +: API_WIDTH];
             end
         end
     end // addr_decoder
-
 endmodule // mult
 
 //======================================================================

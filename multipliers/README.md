@@ -22,6 +22,15 @@ the multiplication. We assume that hard multipliers are used for the
 multiplication.
 
 
+Note that the actual multiplication is implemented as simple as:
+
+    prod_new = opa_reg * opb_reg;
+
+There is no explicit instantiation of hard macros, pipelines etc. This
+is a single cycle multiplication operation. This leaves implementation
+decisions to the tool.
+
+
 ## Results ##
 ### Altera Cyclone ###
 
@@ -45,5 +54,3 @@ Device: 5CGXFC9E6F31C7
 |     |     |            |            |            |      |      |     |
 |256  |256  | 100        | 1          | 99         | 6963 | 1024 |22.5 |
 |     |     |            |            |            |      |      |     |
-|     |     |            |            |            |      |      |     |
-|-----|-----|------------|------------|------------|------|------|-----|

@@ -55,13 +55,13 @@ module mult(
   //----------------------------------------------------------------
   parameter API_WIDTH       = 16;
 
-  localparam OPA_WIDTH      = 64;
-  localparam OPA_WORDS      = OPA_WIDTH / API_WIDTH;
+  localparam OPA_WORDS      = 2;
+  localparam OPA_WIDTH      = API_WIDTH * OPA_WORDS;
   localparam OPA_BASE_ADDR  = 8'h00;
   localparam OPA_TOP_ADDR   = (OPA_BASE_ADDR + OPA_WORDS - 1);
 
-  localparam OPB_WIDTH      = 64;
-  localparam OPB_WORDS      = OPB_WIDTH / API_WIDTH;
+  localparam OPB_WORDS      = 2;
+  localparam OPB_WIDTH      = API_WIDTH * OPB_WORDS;
   localparam OPB_BASE_ADDR  = 8'h40;
   localparam OPB_TOP_ADDR   = (OPB_BASE_ADDR + OPB_WORDS - 1);
 

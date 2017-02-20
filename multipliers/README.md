@@ -65,15 +65,15 @@ Tool: Altera Quartus Prime 15.1
 
 ### Xilinx Spartan-6 ###
 
-Device:
-Tool:
+Device: XC6SLX75
+Tool: ISE 14.7
 
-| Opa | Opb | DSP         | Slices | Regs | Fmax |
+| Opa | Opb | DSP48A1s    | Slices | Regs | Fmax |
 |-----|-----|-------------|--------|------|------|
 |16   |16   |             |        |      |      |
 |32   |32   |             |        |      |      |
 |48   |38   |             |        |      |      |
-|64   |64   |             |        |      |      |
+|64   |64   | 16          | 259    | 209  |      |
 |96   |96   |             |        |      |      |
 |128  |128  |             |        |      |      |
 |144  |144  |             |        |      |      |

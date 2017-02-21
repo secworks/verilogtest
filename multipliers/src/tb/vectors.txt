@@ -1,0 +1,58 @@
+Test vectors for the multiplier
+-------------------------------
+a = 2**OPA_WIDTH - 1
+b = 2**OPB_WIDTH - 3
+
+
+16 * 16
+a = 0xffff
+b = 0xfffd
+p = 0xfffc0003
+
+
+32 * 16
+a = 0xffffffff
+b = 0xfffd
+å = 0xfffcffff0003
+
+
+32 * 32
+a = 0xffffffff
+b = 0xfffffffd
+p = 0xfffffffc00000003
+
+
+48 * 32
+a = 0xffffffffffff
+b = 0xfffffffd
+p = 0xfffffffcffff00000003
+
+
+48 * 48
+a = 0xffffffffffff
+b = 0xfffffffffffd
+p = 0xfffffffffffc000000000003
+
+
+64 * 32
+a = 0xfffffffffffffffb
+b = 0xfffffffd
+p = 0xfffffffcfffffffb0000000f
+
+
+64 * 64
+a = 0xffffffffffffffff
+b = 0xfffffffffffffffd
+p = 0xfffffffffffefffd000000000003
+
+
+128 * 128
+a = 0xffffffffffffffffffffffffffffffff
+b = 0xfffffffffffffffffffffffffffffffd
+p = 0xfffffffffffffffffffffffffffffffc00000000000000000000000000000003
+
+
+256 * 256
+a = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+b = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd
+p = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc0000000000000000000000000000000000000000000000000000000000000003

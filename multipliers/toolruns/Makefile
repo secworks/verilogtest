@@ -38,17 +38,23 @@
 
 MULT_SRC = ../src/rtl/mult.v
 
-TB_TOP_SRC =../src/tb/tb_mult.v
+TB_MULT_SRC =../src/tb/tb_mult.v
 
 CC=iverilog
 CC_FLAGS=-Wall
 LINT=verilator
 LINT_FLAGS=+1364-2001ext+ --lint-only -Wall -Wwarn-style
 
-all: mult lint
+all: sim mult lint
+
+
+sim:  $(MULT_SRC) $(TB_MULT_SRC)
+	$(CC) $(CC_FLAGS) -o sim  $(TB_MULT_SRC) $(MULT_SRC)
+
 
 mult: $(MULT_SRC)
 	$(CC) $(CC_FLAGS) -o mult $(MULT_SRC)
+
 
 lint: $(MULT_SRC)
 	$(LINT) $(LINT_FLAGS) $(MULT_SRC)

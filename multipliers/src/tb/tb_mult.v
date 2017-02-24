@@ -72,7 +72,8 @@ module tb_mult;
   //----------------------------------------------------------------
   // Device Under Test.
   //----------------------------------------------------------------
-  mult dut(
+  mult #(.API_WIDTH(API_WIDTH), .OPA_WIDTH(OPA_WIDTH), .OPB_WIDTH(OPB_WIDTH))
+        dut(
            .clk(tb_clk),
            .reset_n(tb_reset_n),
            .cs(tb_cs),
@@ -125,6 +126,7 @@ module tb_mult;
       tb_reset_n = 0;
       #(2 * CLK_PERIOD);
       tb_reset_n = 1;
+      $display("");
     end
   endtask // reset_dut
 
@@ -158,6 +160,9 @@ module tb_mult;
   task dump_dut_state;
     begin
       $display("cycle:  0x%016x", cycle_ctr);
+      $display("operand a: 0x%064x", dut.opa_reg);
+      $display("operand b: 0x%064x", dut.opb_reg);
+      $display("product:   0x%0128x", dut.prod_reg);
       $display("");
     end
   endtask // dump_dut_state
@@ -207,8 +212,7 @@ module tb_mult;
   //
   // Write the given word to the DUT using the DUT interface.
   //----------------------------------------------------------------
-  task write_word(input [11 : 0] address,
-                  input [31 : 0] word);
+  task write_word(input [7 : 0] address, input [(API_WIDTH - 1) : 0] word);
     begin
       if (DEBUG)
         begin
@@ -257,13 +261,16 @@ module tb_mult;
   //----------------------------------------------------------------
   initial
     begin : main
-      $display("*** Testbench for CMAC started ***");
+      $display("*** Testbench for the multiplier started ***");
       $display("");
 
       init_sim();
+      dump_dut_state();
+      reset_dut();
+      dump_dut_state();
       display_test_results();
 
-      $display("*** CMAC simulation done. ***");
+      $display("*** Multiplier testbench done. ***");
       $finish;
     end // main
 

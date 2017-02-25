@@ -257,6 +257,23 @@ module tb_mult;
 
 
   //----------------------------------------------------------------
+  //----------------------------------------------------------------
+  task tc1;
+    begin
+      write_word(8'h00, 16'haa55);
+      write_word(8'h01, 16'haa55);
+      write_word(8'h02, 16'hdead);
+      write_word(8'h04, 16'hbeef);
+
+      write_word(8'h40, 16'h1122);
+      write_word(8'h41, 16'h3344);
+      write_word(8'h42, 16'h5566);
+      write_word(8'h44, 16'h7788);
+    end
+  endtask // tc1
+
+
+  //----------------------------------------------------------------
   // main
   //----------------------------------------------------------------
   initial
@@ -268,6 +285,10 @@ module tb_mult;
       dump_dut_state();
       reset_dut();
       dump_dut_state();
+
+      tc1();
+      dump_dut_state();
+
       display_test_results();
 
       $display("*** Multiplier testbench done. ***");

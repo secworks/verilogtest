@@ -54,14 +54,14 @@ module mult(
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
   parameter API_WIDTH       = 16;
+  parameter OPA_WIDTH       = 32;
+  parameter OPB_WIDTH       = 32;
 
-  localparam OPA_WORDS      = 2;
-  localparam OPA_WIDTH      = API_WIDTH * OPA_WORDS;
+  localparam OPA_WORDS      = OPA_WIDTH / API_WIDTH;
   localparam OPA_BASE_ADDR  = 8'h00;
   localparam OPA_TOP_ADDR   = (OPA_BASE_ADDR + OPA_WORDS - 1);
 
-  localparam OPB_WORDS      = 2;
-  localparam OPB_WIDTH      = API_WIDTH * OPB_WORDS;
+  localparam OPB_WORDS      = OPB_WIDTH / API_WIDTH;
   localparam OPB_BASE_ADDR  = 8'h40;
   localparam OPB_TOP_ADDR   = (OPB_BASE_ADDR + OPB_WORDS - 1);
 
@@ -144,22 +144,22 @@ module mult(
   always @*
     begin : api
       tmp_read_data = {(API_WIDTH){1'h0}};
-      opa_new       = {(OPA_WIDTH){1'h0}};
+      opa_new       = opa_reg;
       opa_we        = 0;
-      opb_new       = {(OPB_WIDTH){1'h0}};
+      opb_new       = opb_reg;
       opb_we        = 0;
 
       if (cs)
         begin
           if (we)
             begin
-              if ((addr <= OPA_BASE_ADDR) && (addr <= OPA_TOP_ADDR))
+              if ((addr >= OPA_BASE_ADDR) && (addr <= OPA_TOP_ADDR))
                 begin
                   opa_new[API_WIDTH * (addr - OPA_BASE_ADDR) +: API_WIDTH] = write_data;
                   opa_we = 1;
                 end
 
-              if ((addr <= OPB_BASE_ADDR) && (addr <= OPB_TOP_ADDR))
+              if ((addr >= OPB_BASE_ADDR) && (addr <= OPB_TOP_ADDR))
                 begin
                   opb_new[API_WIDTH * (addr - OPB_BASE_ADDR) +: API_WIDTH] = write_data;
                   opb_we = 1;

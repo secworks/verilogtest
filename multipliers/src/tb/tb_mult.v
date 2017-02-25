@@ -41,7 +41,7 @@ module tb_mult;
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG     = 0;
+  parameter DEBUG     = 1;
 
   parameter CLK_HALF_PERIOD = 1;
   parameter CLK_PERIOD      = 2 * CLK_HALF_PERIOD;
@@ -116,6 +116,23 @@ module tb_mult;
 
 
   //----------------------------------------------------------------
+  // dump_dut_state()
+  //
+  // Dump the state of the dump when needed.
+  //----------------------------------------------------------------
+  task dump_dut_state;
+    begin
+      $display("cycle: 0x%016x", cycle_ctr);
+      $display("addr: 0x%02x, data = 0x%08x, cs = 0x%01x, we = 0x%01x", dut.addr, dut.write_data, dut.cs, dut.we);
+      $display("operand a: 0x%064x, opa_we: 0x%01x", dut.opa_reg, dut.opa_we);
+      $display("operand b: 0x%064x, opb_we: 0x%01x", dut.opb_reg, dut.opb_we);
+      $display("product:   0x%0128x", dut.prod_reg);
+      $display("");
+    end
+  endtask // dump_dut_state
+
+
+  //----------------------------------------------------------------
   // reset_dut()
   //
   // Toggle reset to put the DUT into a well known state.
@@ -150,22 +167,6 @@ module tb_mult;
         end
     end
   endtask // display_test_results
-
-
-  //----------------------------------------------------------------
-  // dump_dut_state()
-  //
-  // Dump the state of the dump when needed.
-  //----------------------------------------------------------------
-  task dump_dut_state;
-    begin
-      $display("cycle:  0x%016x", cycle_ctr);
-      $display("operand a: 0x%064x", dut.opa_reg);
-      $display("operand b: 0x%064x", dut.opb_reg);
-      $display("product:   0x%0128x", dut.prod_reg);
-      $display("");
-    end
-  endtask // dump_dut_state
 
 
   //----------------------------------------------------------------
@@ -214,17 +215,14 @@ module tb_mult;
   //----------------------------------------------------------------
   task write_word(input [7 : 0] address, input [(API_WIDTH - 1) : 0] word);
     begin
-      if (DEBUG)
-        begin
-          $display("*** Writing 0x%08x to 0x%02x.", word, address);
-          $display("");
-        end
+      $display("*** Writing 0x%08x to 0x%02x.", word, address);
+      $display("");
 
       tb_address = address;
       tb_write_data = word;
       tb_cs = 1;
       tb_we = 1;
-      #(2 * CLK_PERIOD);
+      #(CLK_PERIOD);
       tb_cs = 0;
       tb_we = 0;
     end
@@ -260,15 +258,18 @@ module tb_mult;
   //----------------------------------------------------------------
   task tc1;
     begin
-      write_word(8'h00, 16'haa55);
-      write_word(8'h01, 16'haa55);
-      write_word(8'h02, 16'hdead);
-      write_word(8'h04, 16'hbeef);
+      $display("TC1: Writing data into operand registers:");
+
+      write_word(8'h00, 16'haabb);
+      write_word(8'h01, 16'hccdd);
+      write_word(8'h02, 16'heeff);
+      write_word(8'h03, 16'h0011);
 
       write_word(8'h40, 16'h1122);
       write_word(8'h41, 16'h3344);
       write_word(8'h42, 16'h5566);
-      write_word(8'h44, 16'h7788);
+      write_word(8'h43, 16'h7788);
+      $display("");
     end
   endtask // tc1
 

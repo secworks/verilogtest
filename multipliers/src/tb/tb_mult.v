@@ -260,15 +260,15 @@ module tb_mult;
     begin
       $display("TC1: Writing data into operand registers:");
 
-      write_word(8'h00, 16'haabb);
-      write_word(8'h01, 16'hccdd);
-      write_word(8'h02, 16'heeff);
-      write_word(8'h03, 16'h0011);
+      write_word(8'h00, 16'hffff);
+      write_word(8'h01, 16'hffff);
+      write_word(8'h02, 16'hffff);
+      write_word(8'h03, 16'hffff);
 
-      write_word(8'h40, 16'h1122);
-      write_word(8'h41, 16'h3344);
-      write_word(8'h42, 16'h5566);
-      write_word(8'h43, 16'h7788);
+      write_word(8'h40, 16'hfffd);
+      write_word(8'h41, 16'hffff);
+      write_word(8'h42, 16'hffff);
+      write_word(8'h43, 16'hffff);
       $display("");
     end
   endtask // tc1

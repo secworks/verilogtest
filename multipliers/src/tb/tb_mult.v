@@ -270,6 +270,16 @@ module tb_mult;
       write_word(8'h42, 16'hffff);
       write_word(8'h43, 16'hffff);
       $display("");
+
+      $display("TC1: Reading out data from product registers:");
+      read_word(8'h80);
+      read_word(8'h81);
+      read_word(8'h82);
+      read_word(8'h83);
+      read_word(8'h84);
+      read_word(8'h85);
+      read_word(8'h86);
+      read_word(8'h87);
     end
   endtask // tc1
 

@@ -168,7 +168,7 @@ module mult(
 
           else
             begin
-              if ((addr <= PROD_BASE_ADDR) && (addr <= PROD_TOP_ADDR))
+              if ((addr >= PROD_BASE_ADDR) && (addr <= PROD_TOP_ADDR))
                 tmp_read_data = prod_reg[API_WIDTH * (addr - PROD_BASE_ADDR) +: API_WIDTH];
             end
         end

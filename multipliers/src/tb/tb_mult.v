@@ -47,8 +47,8 @@ module tb_mult;
   parameter CLK_PERIOD      = 2 * CLK_HALF_PERIOD;
 
   parameter API_WIDTH  = 16;
-  localparam OPA_WIDTH = 64;
-  localparam OPB_WIDTH = 64;
+  localparam OPA_WIDTH = 128;
+  localparam OPB_WIDTH = 128;
 
 
   //----------------------------------------------------------------
@@ -63,6 +63,7 @@ module tb_mult;
   wire [(API_WIDTH - 1) : 0] tb_read_data;
 
   reg [(API_WIDTH - 1) : 0]  read_data;
+  reg [255 : 0]              result_data;
 
   reg [31 : 0]               cycle_ctr;
   reg [31 : 0]               error_ctr;
@@ -255,31 +256,59 @@ module tb_mult;
 
 
   //----------------------------------------------------------------
+  // read_result()
+  //
+  // Read the result block in the dut.
+  //----------------------------------------------------------------
+  task read_result;
+    begin : rd_res
+      integer i;
+      for (i = 0; i < 16 ; i = i + 1)
+        begin
+          read_word(i + 8'h80);
+          result_data[API_WIDTH * i +: API_WIDTH] = read_data;
+        end
+      end
+  endtask // read_result
+
+
+  //----------------------------------------------------------------
   //----------------------------------------------------------------
   task tc1;
     begin
       $display("TC1: Writing data into operand registers:");
+      inc_tc_ctr();
 
       write_word(8'h00, 16'hffff);
       write_word(8'h01, 16'hffff);
       write_word(8'h02, 16'hffff);
       write_word(8'h03, 16'hffff);
+      write_word(8'h04, 16'hffff);
+      write_word(8'h05, 16'hffff);
+      write_word(8'h06, 16'hffff);
+      write_word(8'h07, 16'hffff);
 
       write_word(8'h40, 16'hfffd);
-      write_word(8'h41, 16'hffff);
-      write_word(8'h42, 16'hffff);
-      write_word(8'h43, 16'hffff);
+      write_word(8'h41, 16'hfffd);
+      write_word(8'h42, 16'hfffd);
+      write_word(8'h43, 16'hfffd);
+      write_word(8'h44, 16'hfffd);
+      write_word(8'h45, 16'hfffd);
+      write_word(8'h46, 16'hfffd);
+      write_word(8'h47, 16'hfffd);
       $display("");
 
       $display("TC1: Reading out data from product registers:");
-      read_word(8'h80);
-      read_word(8'h81);
-      read_word(8'h82);
-      read_word(8'h83);
-      read_word(8'h84);
-      read_word(8'h85);
-      read_word(8'h86);
-      read_word(8'h87);
+      read_result();
+
+      if (result_data == 256'hfffdfffdfffdfffdfffdfffdfffdfffc00020002000200020002000200020003)
+        $display("TC1: SUCCESS. Multiplication correct.");
+      else
+        begin
+          $display("TC1: FAILURE. Multiplication not correct.");
+          inc_error_ctr();
+        end
+      $display("");
     end
   endtask // tc1
 

@@ -274,28 +274,19 @@ module tb_mult;
 
   //----------------------------------------------------------------
   //----------------------------------------------------------------
-  task tc1;
-    begin
+  task test_case1;
+    begin : tc1
+      integer i;
+
       $display("TC1: Writing data into operand registers:");
       inc_tc_ctr();
 
-      write_word(8'h00, 16'hffff);
-      write_word(8'h01, 16'hffff);
-      write_word(8'h02, 16'hffff);
-      write_word(8'h03, 16'hffff);
-      write_word(8'h04, 16'hffff);
-      write_word(8'h05, 16'hffff);
-      write_word(8'h06, 16'hffff);
-      write_word(8'h07, 16'hffff);
+      for (i = 0 ; i < 8 ; i = i + 1)
+        begin
+          write_word(i, 16'hffff);
 
-      write_word(8'h40, 16'hfffd);
-      write_word(8'h41, 16'hfffd);
-      write_word(8'h42, 16'hfffd);
-      write_word(8'h43, 16'hfffd);
-      write_word(8'h44, 16'hfffd);
-      write_word(8'h45, 16'hfffd);
-      write_word(8'h46, 16'hfffd);
-      write_word(8'h47, 16'hfffd);
+          write_word(i + 8'h40, 16'hfffd);
+        end
       $display("");
 
       $display("TC1: Reading out data from product registers:");
@@ -310,7 +301,7 @@ module tb_mult;
         end
       $display("");
     end
-  endtask // tc1
+  endtask
 
 
   //----------------------------------------------------------------
@@ -326,7 +317,7 @@ module tb_mult;
       reset_dut();
       dump_dut_state();
 
-      tc1();
+      test_case1();
       dump_dut_state();
 
       display_test_results();

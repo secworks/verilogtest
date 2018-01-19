@@ -54,8 +54,8 @@ module mult(
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
   parameter API_WIDTH       = 16;
-  parameter OPA_WIDTH       = 32;
-  parameter OPB_WIDTH       = 32;
+  parameter OPA_WIDTH       = 256;
+  parameter OPB_WIDTH       = 64;
 
   localparam OPA_WORDS      = OPA_WIDTH / API_WIDTH;
   localparam OPA_BASE_ADDR  = 8'h00;
